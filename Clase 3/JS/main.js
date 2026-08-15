@@ -1,73 +1,119 @@
-// 1. Función para el minijuego de apuestas
-function pedirNumeroSecreto() {
-    const NUMERO_SECRETO = 5;
-    const PREMIO = 1000;
-    let intentosRestantes = 3;
-    let totalGanado = 0;
+// 1. Matriz/Array inicial de vehículos
+let inventarioAutos = [
+  { modelo: "Equinox", cantidad: 15, colores: ["blanco", "negro", "azul"] },
+  { modelo: "Corolla", cantidad: 22, colores: ["blanco", "negro", "azul"] },
+  { modelo: "Silverado", cantidad: 12, colores: ["blanco", "negro", "azul"] },
+  { modelo: "Trailblazer", cantidad: 22, colores: ["blanco", "negro", "azul"] }
+];
 
-    while (intentosRestantes > 0) {
-        let entrada = prompt(`Adivina el número del 1 al 10 para ganar $${PREMIO} pesos (Te quedan ${intentosRestantes} intento(s)):`);
-        if (entrada === null) {
-            console.log("Juego cancelado.");
-            break;
-        }
-        let numero = parseInt(entrada);
+// Pedir nombre del administrador
+let nombreAdmin = prompt("Por favor, ingresa tu nombre de administrador:");
+while (!nombreAdmin || nombreAdmin.trim() === "") {
+  nombreAdmin = prompt("Nombre no válido. Por favor, ingresa tu nombre de administrador:");
+}
+console.log(`=== BIENVENIDO/A AL SISTEMA, ${nombreAdmin.toUpperCase()} ===\n`);
 
-        if (isNaN(numero) || numero < 1 || numero > 10) {
-            console.log("Error: Debes ingresar un número válido entre 1 y 10.");
-            continue;
-        }
-        if (numero === NUMERO_SECRETO) {
-            console.log(`¡Felicidades! Adivinaste el número secreto y has ganado $${PREMIO} pesos.`);
-            totalGanado = PREMIO;
-            break;
-        }
-        intentosRestantes--;
-        if (intentosRestantes > 0) {
-            console.log(`Incorrecto. Te quedan ${intentosRestantes} intento(s).`);
-        }
-    }
-    if (totalGanado === 0 && intentosRestantes === 0) {
-        console.log(`Agotaste tus intentos. El número secreto era ${NUMERO_SECRETO}.`);
-    }
-    console.log(`\nJuego finalizado. Total ganado: $${totalGanado} pesos. Te estará llegando el dinero pronto.`);
+// Función auxiliar para obtener array de nombres en minúsculas
+function obtenerNombresMinusculas(arrayAutos) {
+  let nombres = [];
+  for (const auto of arrayAutos) {
+    nombres.push(auto.modelo.toLowerCase());
+  }
+  return nombres;
 }
 
-// 2. Función para calcular la edad
-function calcularEdad(nacimiento, actual) {
-    return actual - nacimiento;
+// 3. Iteración Eficiente con for...of
+console.log("Modelos de autos disponibles actualmente:");
+for (const auto of inventarioAutos) {
+  console.log(`- ${auto.modelo}`);
+}
+console.log("--------------------------------------------------");
+
+// 4. Consulta de cantidad con lista de modelos y detalle de unidades
+let respuestaConsultar = prompt("¿Quieres saber qué cantidad existe de algún modelo? (si/no)");
+
+while (!respuestaConsultar || (respuestaConsultar.toLowerCase() !== "si" && respuestaConsultar.toLowerCase() !== "no")) {
+  respuestaConsultar = prompt("Opción inválida. Responde con 'si' o 'no': ¿Quieres saber qué cantidad existe de algún modelo?");
 }
 
-// 3. Función para alertar a menores de edad
-function alertaMenorDeEdad(nombre) {
-    alert("¡Atención " + nombre + "! Estaremos llamando a tus padres ya que este no es un sitio para menores de edad.");
-    console.log("Acceso denegado: El usuario es menor de edad y no puede continuar.");
+if (respuestaConsultar.toLowerCase() === "si") {
+  let listaModelosTexto = inventarioAutos.map(auto => auto.modelo).join(", ");
+  let modeloConsulta = prompt(`¿De qué modelo deseas saber la cantidad? (${listaModelosTexto})`);
+  let nombresMinusculas = obtenerNombresMinusculas(inventarioAutos);
+
+  while (!modeloConsulta || !nombresMinusculas.includes(modeloConsulta.toLowerCase())) {
+    modeloConsulta = prompt(`Modelo no encontrado. Por favor, escríbelo correctamente (${listaModelosTexto}):`);
+  }
+
+  let indice = nombresMinusculas.indexOf(modeloConsulta.toLowerCase());
+  // Muestra por pantalla (vía alert) y consola las unidades del modelo solicitado
+  alert(`El modelo ${inventarioAutos[indice].modelo} tiene ${inventarioAutos[indice].cantidad} unidades.`);
+  console.log(`\n🔍 El modelo "${inventarioAutos[indice].modelo}" tiene ${inventarioAutos[indice].cantidad} unidades disponibles.`);
+  console.log("--------------------------------------------------");
 }
 
-// --- FLUJO PRINCIPAL DEL PROGRAMA ---
+// 5. Pregunta de eliminación con modelos y sus unidades incluidas en el prompt
+let resumenConUnidades = inventarioAutos.map(auto => `${auto.modelo} (${auto.cantidad} unidades)`).join(", ");
+let respuestaEliminar = prompt(`¿Deseas eliminar algún modelo por falta de stock? (si/no) (${resumenConUnidades})`);
 
-const anioActual = new Date().getFullYear();
-let tuNombre = prompt("Dime tu nombre:");
-
-if (!tuNombre) tuNombre = "Jugador";
-
-console.log("Un gusto en saludarte " + tuNombre + ", ya vamos a validar si puedes ingresar al juego.");
-
-let fechadeN = prompt("Dime tu año de nacimiento:");
-while (fechadeN === null || isNaN(fechadeN) || fechadeN.trim() === "") {
-    fechadeN = prompt("Error: Debes ingresar un número. Dime tu año de nacimiento:");
+while (!respuestaEliminar || (respuestaEliminar.toLowerCase() !== "si" && respuestaEliminar.toLowerCase() !== "no")) {
+  respuestaEliminar = prompt(`Opción inválida. Responde 'si' o 'no': ¿Deseas eliminar algún modelo por falta de stock? (${resumenConUnidades})`);
 }
-fechadeN = parseInt(fechadeN);
 
-const edad = calcularEdad(fechadeN, anioActual);
-console.log("Tienes " + edad + " años.");
+if (respuestaEliminar.toLowerCase() === "si") {
+  let nombresMinusculas = obtenerNombresMinusculas(inventarioAutos);
+  let modeloAEliminar = prompt(`Ingresa el nombre del modelo a eliminar: (${resumenConUnidades})`);
 
-if (edad >= 18) {
-    console.log("Puedes ingresar a la sala de mayores, eres mayor de edad.");
-    console.log("Bienvenido " + tuNombre + ", iniciando el juego...");
-    
-    // Inicia directamente el juego
-    pedirNumeroSecreto();
-} else {
-    alertaMenorDeEdad(tuNombre);
+  while (!modeloAEliminar || !nombresMinusculas.includes(modeloAEliminar.toLowerCase())) {
+    modeloAEliminar = prompt(`Nombre incorrecto o no existe. Vuelve a escribirlo tal como aparece aquí: (${resumenConUnidades})`);
+  }
+
+  let indiceAEliminar = nombresMinusculas.indexOf(modeloAEliminar.toLowerCase());
+  let autoEliminado = inventarioAutos[indiceAEliminar];
+  
+  inventarioAutos.splice(indiceAEliminar, 1);
+  console.log(`\n✅ El modelo ${autoEliminado.modelo} (${autoEliminado.cantidad} unidades) ha sido eliminado exitosamente.`);
+
+  console.log("\nInventario actualizado tras la eliminación:");
+  for (const auto of inventarioAutos) {
+    console.log(`- Modelo: ${auto.modelo} | Cantidad: ${auto.cantidad} | Colores: ${auto.colores.join(", ")}`);
+  }
+  console.log("--------------------------------------------------");
 }
+
+// 6. Pregunta de agregar nuevo modelo con resumen de existencias
+let resumenInventarioFinal = inventarioAutos.map(auto => `${auto.modelo} (${auto.cantidad} unidades)`).join(", ");
+let respuestaAgregar = prompt(`El inventario actual es: ${resumenInventarioFinal}.\n\n¿Deseas agregar algún otro modelo al inventario? (si/no)`);
+
+while (!respuestaAgregar || (respuestaAgregar.toLowerCase() !== "si" && respuestaAgregar.toLowerCase() !== "no")) {
+  respuestaAgregar = prompt(`pción inválida. Responde 'si' o 'no':\nEl inventario actual es: ${resumenInventarioFinal}.\n¿Deseas agregar algún otro modelo al inventario?`);
+}
+
+if (respuestaAgregar.toLowerCase() === "si") {
+  let nuevoModelo = prompt("Ingresa el nombre del nuevo modelo:");
+  let nombresMinusculas = obtenerNombresMinusculas(inventarioAutos);
+
+  let cantidadInput = prompt("Ingresa la cantidad disponible:");
+  let nuevaCantidad = parseInt(cantidadInput, 10);
+
+  while (isNaN(nuevaCantidad) || nuevaCantidad < 0) {
+    nuevaCantidad = parseInt(prompt("Por favor ingresa un número válido para la cantidad:"), 10);
+  }
+
+  let nuevoAuto = {
+    modelo: nuevoModelo,
+    cantidad: nuevaCantidad,
+    colores: ["blanco", "negro", "azul"]
+  };
+
+  inventarioAutos.push(nuevoAuto);
+  console.log(`\n✅ El modelo "${nuevoModelo}" con ${nuevaCantidad} unidades ha sido agregado exitosamente.`);
+
+  // Estado final mostrado con for...of
+  console.log("\nEstado final del inventario:");
+  for (const auto of inventarioAutos) {
+    console.log(`- Modelo: ${auto.modelo} | Cantidad: ${auto.cantidad} | Colores: ${auto.colores.join(", ")}`);
+  }
+}
+
+console.log("\nProceso finalizado. ¡Gracias!");
